@@ -214,7 +214,7 @@ public class MainActivity extends Activity {
             super.onPostExecute(result);
             myPd_ring.dismiss();
             //parse out the message
-            String[] parts = result.split("~");
+            /*String[] parts = result.split("~");
             String name = parts[0];
             String ip = parts[1];
             String mac = parts[2];
@@ -223,7 +223,13 @@ public class MainActivity extends Activity {
             txtIp.setText(ip);
             txtMac.setText(mac);
             Toast toast = Toast.makeText(MainActivity.this, name + "\r" + ip + "\r" + mac, Toast.LENGTH_LONG);
-            toast.show();
+            toast.show();*/
+            String url = "http://maindev.ddns.net:8888/x1/index.php?login=good&cam="+result;
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+
+
 
         }
 
