@@ -6,13 +6,14 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.ActionBarActivity;
+//import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sun.crypto.provider.SunJCE;
@@ -36,13 +37,16 @@ import Decoder.BASE64Encoder;
 
 
 public class MainActivity extends Activity {
-
+    TextView txtName,txtIp,txtMac;
     static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        txtName = (TextView) findViewById(R.id.textView);
+        txtIp = (TextView) findViewById(R.id.textView2);
+        txtMac = (TextView) findViewById(R.id.textView3);
     }
 
     @Override
@@ -111,7 +115,16 @@ public class MainActivity extends Activity {
                     e.printStackTrace();
                 }
 
-                Toast toast = Toast.makeText(this, contents, Toast.LENGTH_LONG);
+                //parse out the message
+                String[] parts = contents.split("~");
+                String name = parts[0];
+                String ip = parts[1];
+                String mac = parts[2];
+
+                txtName.setText(name);
+                txtIp.setText(ip);
+                txtMac.setText(mac);
+                Toast toast = Toast.makeText(this, name+"\r"+ip+"\r"+mac, Toast.LENGTH_LONG);
                 toast.show();
             }
         }
@@ -158,63 +171,7 @@ public class MainActivity extends Activity {
     }
 
     //rot
-    public static String rot13(String value) {
 
-        char[] values = value.toCharArray();
-        for (int i = 0; i < values.length; i++) {
-            char letter = values[i];
-
-            if (letter >= 'a' && letter <= 'z') {
-                // Rotate lowercase letters.
-
-                if (letter > 'm') {
-                    letter -= 17;
-                } else {
-                    letter += 17;
-                }
-            } else if (letter >= 'A' && letter <= 'Z') {
-                // Rotate uppercase letters.
-
-                if (letter > 'M') {
-                    letter -= 17;
-                } else {
-                    letter += 17;
-                }
-            }
-            values[i] = letter;
-        }
-        // Convert array to a new String.
-        return new String(values);
-    }
-
-    public static String rot14(String value) {
-
-        char[] values = value.toCharArray();
-        for (int i = 0; i < values.length; i++) {
-            char letter = values[i];
-
-            if (letter >= 'a' && letter <= 'z') {
-                // Rotate lowercase letters.
-
-                if (letter > 'm') {
-                    letter -= 18;
-                } else {
-                    letter += 18;
-                }
-            } else if (letter >= 'A' && letter <= 'Z') {
-                // Rotate uppercase letters.
-
-                if (letter > 'M') {
-                    letter -= 18;
-                } else {
-                    letter += 18;
-                }
-            }
-            values[i] = letter;
-        }
-        // Convert array to a new String.
-        return new String(values);
-    }
     public void test(View view){
         try {
             String data = "KL0iJPvOkDFswTAgkS9zVg==";
