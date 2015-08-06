@@ -2,11 +2,13 @@ package com.example.jon.mdqr;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 //import android.support.v7.app.ActionBarActivity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
@@ -37,7 +39,7 @@ import Decoder.BASE64Encoder;
 
 
 public class MainActivity extends Activity {
-    TextView txtName,txtIp,txtMac;
+    TextView txtName, txtIp, txtMac;
     static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
 
     @Override
@@ -71,7 +73,7 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void start (View view){
+    public void start(View view) {
         try {
             Intent intent = new Intent(ACTION_SCAN);
             intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
@@ -110,25 +112,17 @@ public class MainActivity extends Activity {
                 String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
 
                 try {
-                    contents = Decrypt(contents);
+                    //contents = Decrypt(contents);
+                    new MyTask().execute(contents);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                //parse out the message
-                String[] parts = contents.split("~");
-                String name = parts[0];
-                String ip = parts[1];
-                String mac = parts[2];
 
-                txtName.setText(name);
-                txtIp.setText(ip);
-                txtMac.setText(mac);
-                Toast toast = Toast.makeText(this, name+"\r"+ip+"\r"+mac, Toast.LENGTH_LONG);
-                toast.show();
             }
         }
     }
+
     ////
     private static String Encrypt(String raw) throws Exception {
         Cipher c = getCipher(Cipher.ENCRYPT_MODE);
@@ -172,7 +166,7 @@ public class MainActivity extends Activity {
 
     //rot
 
-    public void test(View view){
+    public void test(View view) {
         try {
             String data = "KL0iJPvOkDFswTAgkS9zVg==";
 
@@ -181,11 +175,57 @@ public class MainActivity extends Activity {
 
             String decrypt = Decrypt(data);
             System.out.println(decrypt);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    //backgroud assynctask
+    class MyTask extends AsyncTask<String, Void, String> {
 
+        ProgressDialog myPd_ring = null;
+
+        @Override
+        protected void onPreExecute() {
+
+
+            myPd_ring = new ProgressDialog(MainActivity.this);
+            myPd_ring.setMessage("Decrypting...");
+            myPd_ring.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String page = null;
+            try {
+                page = Decrypt(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return page;
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+            myPd_ring.dismiss();
+            //parse out the message
+            String[] parts = result.split("~");
+            String name = parts[0];
+            String ip = parts[1];
+            String mac = parts[2];
+
+            txtName.setText(name);
+            txtIp.setText(ip);
+            txtMac.setText(mac);
+            Toast toast = Toast.makeText(MainActivity.this, name + "\r" + ip + "\r" + mac, Toast.LENGTH_LONG);
+            toast.show();
+
+        }
+
+    }
 }
