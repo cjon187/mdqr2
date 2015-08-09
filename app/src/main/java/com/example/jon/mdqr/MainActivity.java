@@ -39,16 +39,14 @@ import Decoder.BASE64Encoder;
 
 
 public class MainActivity extends Activity {
-    TextView txtName, txtIp, txtMac;
+
     static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        txtName = (TextView) findViewById(R.id.textView);
-        txtIp = (TextView) findViewById(R.id.textView2);
-        txtMac = (TextView) findViewById(R.id.textView3);
+
     }
 
     @Override
@@ -121,6 +119,21 @@ public class MainActivity extends Activity {
 
             }
         }
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                String contents = intent.getStringExtra("SCAN_RESULT");
+                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+
+                try {
+                    //contents = Decrypt(contents);
+                    new MyTask2().execute(contents);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }
     }
 
     ////
@@ -166,17 +179,13 @@ public class MainActivity extends Activity {
 
     //rot
 
-    public void test(View view) {
+    public void start2(View view) {
         try {
-            String data = "KL0iJPvOkDFswTAgkS9zVg==";
-
-            //String encrypt = Encrypt(data);
-            //System.out.println(encrypt);
-
-            String decrypt = Decrypt(data);
-            System.out.println(decrypt);
-        } catch (Exception e) {
-            e.printStackTrace();
+            Intent intent = new Intent(ACTION_SCAN);
+            intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+            startActivityForResult(intent, 1);
+        } catch (ActivityNotFoundException anfe) {
+            showDialog(MainActivity.this, "No Scanner Found", "Download a scanner code activity?", "Yes", "No").show();
         }
     }
 
@@ -213,18 +222,51 @@ public class MainActivity extends Activity {
 
             super.onPostExecute(result);
             myPd_ring.dismiss();
-            //parse out the message
-            /*String[] parts = result.split("~");
-            String name = parts[0];
-            String ip = parts[1];
-            String mac = parts[2];
 
-            txtName.setText(name);
-            txtIp.setText(ip);
-            txtMac.setText(mac);
-            Toast toast = Toast.makeText(MainActivity.this, name + "\r" + ip + "\r" + mac, Toast.LENGTH_LONG);
-            toast.show();*/
             String url = "http://maindev.ddns.net:8888/x1/index.php?login=good&cam="+result;
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+
+
+
+        }
+
+    }
+    class MyTask2 extends AsyncTask<String, Void, String> {
+
+        ProgressDialog myPd_ring = null;
+
+        @Override
+        protected void onPreExecute() {
+
+
+            myPd_ring = new ProgressDialog(MainActivity.this);
+            myPd_ring.setMessage("Decrypting...");
+            myPd_ring.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String page = null;
+            try {
+                page = Decrypt(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return page;
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            super.onPostExecute(result);
+            myPd_ring.dismiss();
+
+            String url = "http://maindev.ddns.net:8888/x1/switch.php?login=good&cam="+result;
             Intent i = new Intent(Intent.ACTION_VIEW);
             i.setData(Uri.parse(url));
             startActivity(i);
