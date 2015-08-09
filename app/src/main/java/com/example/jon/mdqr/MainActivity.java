@@ -15,15 +15,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sun.crypto.provider.SunJCE;
 
+
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -40,7 +43,11 @@ import Decoder.BASE64Encoder;
 
 public class MainActivity extends Activity {
 
+
+    String[] camArray = { "p1357camera", "p3367vecamera"};
+    String[] swArray = { "n2024pswitch"};
     static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +79,7 @@ public class MainActivity extends Activity {
     }
 
     public void start(View view) {
+
         try {
             Intent intent = new Intent(ACTION_SCAN);
             intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
@@ -119,21 +127,7 @@ public class MainActivity extends Activity {
 
             }
         }
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                String contents = intent.getStringExtra("SCAN_RESULT");
-                String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
 
-                try {
-                    //contents = Decrypt(contents);
-                    new MyTask2().execute(contents);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-        }
     }
 
     ////
@@ -177,17 +171,7 @@ public class MainActivity extends Activity {
 
     }
 
-    //rot
 
-    public void start2(View view) {
-        try {
-            Intent intent = new Intent(ACTION_SCAN);
-            intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-            startActivityForResult(intent, 1);
-        } catch (ActivityNotFoundException anfe) {
-            showDialog(MainActivity.this, "No Scanner Found", "Download a scanner code activity?", "Yes", "No").show();
-        }
-    }
 
     //backgroud assynctask
     class MyTask extends AsyncTask<String, Void, String> {
@@ -200,6 +184,10 @@ public class MainActivity extends Activity {
 
             myPd_ring = new ProgressDialog(MainActivity.this);
             myPd_ring.setMessage("Decrypting...");
+            myPd_ring.setTitle("Please Wait..");
+            myPd_ring.setIcon(R.drawable.guru);
+            myPd_ring.setCancelable(false);
+            myPd_ring.setCanceledOnTouchOutside(false);
             myPd_ring.show();
 
         }
@@ -210,6 +198,8 @@ public class MainActivity extends Activity {
             String page = null;
             try {
                 page = Decrypt(params[0]);
+                //parse out the message
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -223,57 +213,35 @@ public class MainActivity extends Activity {
             super.onPostExecute(result);
             myPd_ring.dismiss();
 
-            String url = "http://maindev.ddns.net:8888/x1/index.php?login=good&cam="+result;
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivity(i);
+            String[] parts = result.split("~");
+            String string1 = parts[0];
+            String string2 = parts[1];
+            Log.d("spilt", string1 + " " + string2);
 
 
 
-        }
 
-    }
-    class MyTask2 extends AsyncTask<String, Void, String> {
-
-        ProgressDialog myPd_ring = null;
-
-        @Override
-        protected void onPreExecute() {
-
-
-            myPd_ring = new ProgressDialog(MainActivity.this);
-            myPd_ring.setMessage("Decrypting...");
-            myPd_ring.show();
-
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            String page = null;
-            try {
-                page = Decrypt(params[0]);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (Arrays.asList(camArray).contains(string2)) {
+                Toast.makeText(getApplicationContext(),"Camera Qr Scanned",Toast.LENGTH_SHORT).show();
+                String url = "http://maindev.ddns.net:8888/x1/index.php?login=good&cam=" + string1;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
             }
-            return page;
 
-        }
+        if (Arrays.asList(swArray).contains(string2)) {
+                Toast.makeText(getApplicationContext(),"Switch QR Scanned",Toast.LENGTH_SHORT).show();
+                String url = "http://maindev.ddns.net:8888/x1/switch.php?login=good&cam=" + string1;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
 
-        @Override
-        protected void onPostExecute(String result) {
-
-            super.onPostExecute(result);
-            myPd_ring.dismiss();
-
-            String url = "http://maindev.ddns.net:8888/x1/switch.php?login=good&cam="+result;
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            startActivity(i);
 
 
 
         }
 
     }
+
 }
