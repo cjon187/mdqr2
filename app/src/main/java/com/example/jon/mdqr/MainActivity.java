@@ -44,8 +44,8 @@ import Decoder.BASE64Encoder;
 public class MainActivity extends Activity {
 
 
-    String[] camArray = { "p1357camera", "p3367vecamera"};
-    String[] swArray = { "n2024pswitch"};
+    String[] camArray = { "p1357camera", "p3367vecamera","q6044ecamera"};
+    String[] swArray = { "n2024pswitch","n3024fswitch","n3024pswitch","s4810switch"};
     static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
 
 
