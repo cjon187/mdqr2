@@ -223,7 +223,7 @@ public class MainActivity extends Activity {
 
         if (Arrays.asList(camArray).contains(string2)) {
                 Toast.makeText(getApplicationContext(),"Camera Qr Scanned",Toast.LENGTH_SHORT).show();
-                String url = "http://maindev.ddns.net:8888/x1/index.php?login=good&cam=" + string1;
+                String url = "http://maindev.ddns.net:8888/cas/index.php?login=good&cam=" + string1;
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
@@ -231,7 +231,7 @@ public class MainActivity extends Activity {
 
         if (Arrays.asList(swArray).contains(string2)) {
                 Toast.makeText(getApplicationContext(),"Switch QR Scanned",Toast.LENGTH_SHORT).show();
-                String url = "http://maindev.ddns.net:8888/x1/switch.php?login=good&cam=" + string1;
+                String url = "http://maindev.ddns.net:8888/cas/switch.php?login=good&cam=" + string1+"&partype="+string2;
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
