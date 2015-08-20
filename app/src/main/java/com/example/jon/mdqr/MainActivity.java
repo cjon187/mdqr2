@@ -44,7 +44,7 @@ import Decoder.BASE64Encoder;
 public class MainActivity extends Activity {
 
 
-    String[] camArray = { "p1357camera", "p3367vecamera","q6044ecamera"};
+    String[] camArray = { "p1357camera", "p3367vecamera","q6044ecamera","p3034f"};
     String[] swArray = { "n2024pswitch","n3024fswitch","n3024pswitch","s4810switch"};
     static final String ACTION_SCAN = "com.google.zxing.client.android.SCAN";
 
@@ -223,7 +223,7 @@ public class MainActivity extends Activity {
 
         if (Arrays.asList(camArray).contains(string2)) {
                 Toast.makeText(getApplicationContext(),"Camera Qr Scanned",Toast.LENGTH_SHORT).show();
-                String url = "http://maindev.ddns.net:8888/cas/index.php?login=good&cam=" + string1;
+                String url = "http://maindev.ddns.net:8888/x1/index.php?login=good&cam=" + string1;
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
@@ -231,7 +231,7 @@ public class MainActivity extends Activity {
 
         if (Arrays.asList(swArray).contains(string2)) {
                 Toast.makeText(getApplicationContext(),"Switch QR Scanned",Toast.LENGTH_SHORT).show();
-                String url = "http://maindev.ddns.net:8888/cas/switch.php?login=good&cam=" + string1+"&partype="+string2;
+                String url = "http://maindev.ddns.net:8888/x1/switch.php?login=good&cam=" + string1+"&partype="+string2;
                 Intent i = new Intent(Intent.ACTION_VIEW);
                 i.setData(Uri.parse(url));
                 startActivity(i);
